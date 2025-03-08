@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Yal.BookStore.Blazor.WebApp.Client": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:50456;http://localhost:50460"
+    }
+  }
+}
