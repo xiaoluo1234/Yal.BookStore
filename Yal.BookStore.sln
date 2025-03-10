@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29020.237
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yal.BookStore.Domain", "src\Yal.BookStore.Domain\Yal.BookStore.Domain.csproj", "{554AD327-6DBA-4F8F-96F8-81CE7A0C863F}"
 EndProject
@@ -36,16 +36,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yal.BookStore.HttpApi.Client.ConsoleTestApp", "test\Yal.BookStore.HttpApi.Client.ConsoleTestApp\Yal.BookStore.HttpApi.Client.ConsoleTestApp.csproj", "{EF480016-9127-4916-8735-D2466BDBC582}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yal.BookStore.DbMigrator", "src\Yal.BookStore.DbMigrator\Yal.BookStore.DbMigrator.csproj", "{AA94D832-1CCC-4715-95A9-A483F23A1A5D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yal.BookStore.Blazor.Client", "src\Yal.BookStore.Blazor.Client\Yal.BookStore.Blazor.Client.csproj", "{188A64AD-A1A7-4F95-85D1-C935594611B7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yal.BookStore.Blazor.WebApp", "src\Yal.BookStore.Blazor.WebApp\Yal.BookStore.Blazor.WebApp.csproj", "{14882ABF-1EEF-430C-8E72-812B3EE810C4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yal.BookStore.Blazor.WebApp.Client", "src\Yal.BookStore.Blazor.WebApp.Client\Yal.BookStore.Blazor.WebApp.Client.csproj", "{648460F4-3ECC-4751-9D87-EE25D0B8B2BF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yal.BookStore.Blazor.WebApp.Tiered", "src\Yal.BookStore.Blazor.WebApp.Tiered\Yal.BookStore.Blazor.WebApp.Tiered.csproj", "{8A3E5E20-F162-4321-8AD5-23DD7B2B0E74}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yal.BookStore.Blazor.WebApp.Tiered.Client", "src\Yal.BookStore.Blazor.WebApp.Tiered.Client\Yal.BookStore.Blazor.WebApp.Tiered.Client.csproj", "{834C6A10-7562-427C-8771-B0588C35873D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -113,26 +103,6 @@ Global
 		{AA94D832-1CCC-4715-95A9-A483F23A1A5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA94D832-1CCC-4715-95A9-A483F23A1A5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA94D832-1CCC-4715-95A9-A483F23A1A5D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{188A64AD-A1A7-4F95-85D1-C935594611B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{188A64AD-A1A7-4F95-85D1-C935594611B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{188A64AD-A1A7-4F95-85D1-C935594611B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{188A64AD-A1A7-4F95-85D1-C935594611B7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{14882ABF-1EEF-430C-8E72-812B3EE810C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{14882ABF-1EEF-430C-8E72-812B3EE810C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{14882ABF-1EEF-430C-8E72-812B3EE810C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{14882ABF-1EEF-430C-8E72-812B3EE810C4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{648460F4-3ECC-4751-9D87-EE25D0B8B2BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{648460F4-3ECC-4751-9D87-EE25D0B8B2BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{648460F4-3ECC-4751-9D87-EE25D0B8B2BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{648460F4-3ECC-4751-9D87-EE25D0B8B2BF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8A3E5E20-F162-4321-8AD5-23DD7B2B0E74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8A3E5E20-F162-4321-8AD5-23DD7B2B0E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8A3E5E20-F162-4321-8AD5-23DD7B2B0E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8A3E5E20-F162-4321-8AD5-23DD7B2B0E74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{834C6A10-7562-427C-8771-B0588C35873D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{834C6A10-7562-427C-8771-B0588C35873D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{834C6A10-7562-427C-8771-B0588C35873D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{834C6A10-7562-427C-8771-B0588C35873D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,11 +123,6 @@ Global
 		{E512F4D9-9375-480F-A2F6-A46509F9D824} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
 		{EF480016-9127-4916-8735-D2466BDBC582} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
 		{AA94D832-1CCC-4715-95A9-A483F23A1A5D} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
-		{188A64AD-A1A7-4F95-85D1-C935594611B7} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
-		{14882ABF-1EEF-430C-8E72-812B3EE810C4} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
-		{648460F4-3ECC-4751-9D87-EE25D0B8B2BF} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
-		{8A3E5E20-F162-4321-8AD5-23DD7B2B0E74} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
-		{834C6A10-7562-427C-8771-B0588C35873D} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}

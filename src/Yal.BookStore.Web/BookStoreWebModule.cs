@@ -110,7 +110,6 @@ public class BookStoreWebModule : AbpModule
         ConfigureAutoMapper();
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureNavigationServices();
-        ConfigureAutoApiControllers();
         ConfigureSwaggerServices(context.Services);
     }
 

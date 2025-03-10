@@ -12,6 +12,8 @@ using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Yal.BookStore.Authors;
+using Yal.BookStore.Books;
 
 namespace Yal.BookStore.EntityFrameworkCore;
 
@@ -21,7 +23,8 @@ namespace Yal.BookStore.EntityFrameworkCore;
 public class BookStoreDbContext :
     AbpDbContext<BookStoreDbContext>,
     IIdentityDbContext,
-    ITenantManagementDbContext
+    ITenantManagementDbContext,
+    IBookStoreDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
@@ -47,6 +50,10 @@ public class BookStoreDbContext :
     public DbSet<IdentityLinkUser> LinkUsers { get; set; }
     public DbSet<IdentityUserDelegation> UserDelegations { get; set; }
     public DbSet<IdentitySession> Sessions { get; set; }
+
+    public DbSet<Book> Books { get; set; }
+
+    public DbSet<Author> Authors { get; set; }
     // Tenant Management
     public DbSet<Tenant> Tenants { get; set; }
     public DbSet<TenantConnectionString> TenantConnectionStrings { get; set; }
@@ -82,5 +89,7 @@ public class BookStoreDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+        builder.ConfigureAuthor();
+        builder.ConfigureBook();
     }
 }
