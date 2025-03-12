@@ -10,6 +10,7 @@ using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.Timing;
 
 namespace Yal.BookStore.EntityFrameworkCore;
 
@@ -47,6 +48,6 @@ public class BookStoreEntityFrameworkCoreModule : AbpModule
                  * See also BookStoreMigrationsDbContextFactory for EF Core tooling. */
             options.UseNpgsql();
         });
-
+        Configure<AbpClockOptions>(x => { x.Kind = System.DateTimeKind.Utc; });
     }
 }

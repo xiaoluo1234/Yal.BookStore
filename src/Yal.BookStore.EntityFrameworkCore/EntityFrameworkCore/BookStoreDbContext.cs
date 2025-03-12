@@ -1,4 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
+using System;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -14,6 +18,7 @@ using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Yal.BookStore.Authors;
 using Yal.BookStore.Books;
+using System.Reflection.Emit;
 
 namespace Yal.BookStore.EntityFrameworkCore;
 
@@ -69,7 +74,6 @@ public class BookStoreDbContext :
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-
         /* Include modules to your migration db context */
 
         builder.ConfigurePermissionManagement();
@@ -80,16 +84,40 @@ public class BookStoreDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureFeatureManagement();
         builder.ConfigureTenantManagement();
-
-        /* Configure your own tables/entities inside here */
-
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(BookStoreConsts.DbTablePrefix + "YourEntities", BookStoreConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
         builder.ConfigureAuthor();
         builder.ConfigureBook();
+    }
+
+    public override int SaveChanges()
+    {
+        ConvertDateTimeToUtc();
+        return base.SaveChanges();
+    }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ConvertDateTimeToUtc();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void ConvertDateTimeToUtc()
+    {
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            var entity = entry.Entity;
+            if (entity == null) continue;
+
+            var properties = entity.GetType()
+                .GetProperties()
+                .Where(p => (p.PropertyType == typeof(DateTime) || p.PropertyType == typeof(DateTime?)) && p.CanWrite);
+
+            foreach (var property in properties)
+            {
+                if (property.GetValue(entity) is DateTime dateTimeValue && dateTimeValue.Kind == DateTimeKind.Local)
+                {
+                    property.SetValue(entity, dateTimeValue.ToUniversalTime());
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Yal.BookStore.Authors;
+using Yal.BookStore.Books;
 
 namespace Yal.BookStore;
 
@@ -6,8 +8,7 @@ public class BookStoreApplicationAutoMapperProfile : Profile
 {
     public BookStoreApplicationAutoMapperProfile()
     {
-        /* You can configure your AutoMapper mapping configuration here.
-         * Alternatively, you can split your mapping configurations
-         * into multiple profile classes for a better organization. */
+        CreateMap<Book, BookDto>();
+        CreateMap<Author, AuthorDto>();
     }
 }
