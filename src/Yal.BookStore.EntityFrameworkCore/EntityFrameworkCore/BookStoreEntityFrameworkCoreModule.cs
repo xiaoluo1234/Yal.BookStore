@@ -37,15 +37,11 @@ public class BookStoreEntityFrameworkCoreModule : AbpModule
     {
         context.Services.AddAbpDbContext<BookStoreDbContext>(options =>
         {
-                /* Remove "includeAllEntities: true" to create
-                 * default repositories only for aggregate roots */
             options.AddDefaultRepositories(includeAllEntities: true);
         });
 
         Configure<AbpDbContextOptions>(options =>
         {
-                /* The main point to change your DBMS.
-                 * See also BookStoreMigrationsDbContextFactory for EF Core tooling. */
             options.UseNpgsql();
         });
         Configure<AbpClockOptions>(x => { x.Kind = System.DateTimeKind.Utc; });

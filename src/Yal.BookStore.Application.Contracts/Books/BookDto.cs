@@ -23,5 +23,10 @@ namespace Yal.BookStore.Books
         /// 描述
         /// </summary>
         public string? Description { get; set; }
+
+        /// <summary>
+        /// 作者名字
+        /// </summary>
+        public string AuthorName { get; set; }
     }
 }

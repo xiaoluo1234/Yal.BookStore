@@ -19,6 +19,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Identity.Web;
 using Volo.Abp.Modularity;
 using Volo.Abp.OpenIddict;
@@ -32,6 +33,7 @@ using Yal.BookStore.EntityFrameworkCore;
 using Yal.BookStore.HttiApi.Host.DbMigrations;
 using Yal.BookStore.Localization;
 using Yal.BookStore.MultiTenancy;
+using Volo.Abp.Caching;
 
 namespace Yal.BookStore.HttpApi.Host;
 
@@ -46,7 +48,8 @@ namespace Yal.BookStore.HttpApi.Host;
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpCachingStackExchangeRedisModule)
     )]
 public class BookStoreHttpApiHostModule : AbpModule
 {
@@ -102,6 +105,11 @@ public class BookStoreHttpApiHostModule : AbpModule
         ConfigureAutoMapper();
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
+        Configure<AbpDistributedCacheOptions>(options => { options.KeyPrefix = "Yal:"; });
+        context.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration["Redis:Configuration"];
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)

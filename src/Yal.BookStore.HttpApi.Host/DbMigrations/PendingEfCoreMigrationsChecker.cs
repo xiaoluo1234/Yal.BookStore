@@ -56,7 +56,6 @@ public abstract class PendingEfCoreMigrationsChecker<TDbContext> : PendingMigrat
 
         using (CurrentTenant.Change(null))
         {
-            // Create database tables if needed
             using (var uow = UnitOfWorkManager.Begin(requiresNew: true, isTransactional: false))
             {
                 var dbContext = ServiceProvider.GetRequiredService<TDbContext>();
@@ -73,7 +72,7 @@ public abstract class PendingEfCoreMigrationsChecker<TDbContext> : PendingMigrat
                 await uow.CompleteAsync();
             }
 
-            await ServiceProvider.GetRequiredService<IDataSeeder>()
+             await ServiceProvider.GetRequiredService<IDataSeeder>()
                 .SeedAsync();
         }
         Log.Information($"Lock is released for db migration and seeding on database named: {DatabaseName}...");

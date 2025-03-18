@@ -5,21 +5,25 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Yal.BookStore.Authors;
+using Yal.BookStore.DataStore;
 
 namespace Yal.BookStore.Books
 {
     public class BookAppService : CrudAppService<Book, BookDto, Guid, BookGetListDto, BookCreateDto, BookUpdateDto>, IBookAppService
     {
         private readonly IBookRepository _bookRepository;
-        private readonly IAuthorAppService _authorAppService;
+        private readonly IDataCacheStore<Author, Guid> _authorCacheStore;
+        private readonly IDataCacheStore<Book, Guid> _bookCacheStore;
 
         public BookAppService(
             IBookRepository bookRepository,
-            IAuthorAppService authorAppService
-            ) : base(bookRepository)
+            IDataCacheStore<Author, Guid> authorCacheStore,
+            IDataCacheStore<Book, Guid> bookCacheStore
+        ) : base(bookRepository)
         {
             _bookRepository = bookRepository;
-            _authorAppService = authorAppService;
+            _authorCacheStore = authorCacheStore;
+            _bookCacheStore = bookCacheStore;
         }
 
         #region ==书籍相关==
@@ -27,11 +31,8 @@ namespace Yal.BookStore.Books
         /// <summary>
         /// 添加一个书籍
         /// </summary>
-        /// <param name="input">书籍创建输入</param>
-        /// <returns>添加的书籍DTO</returns>
         public override async Task<BookDto> CreateAsync(BookCreateDto input)
         {
-            // 检查创建权限
             await CheckCreatePolicyAsync();
 
             var book = new Book(
@@ -49,12 +50,8 @@ namespace Yal.BookStore.Books
         /// <summary>
         /// 更新一个书籍
         /// </summary>
-        /// <param name="id">书籍ID</param>
-        /// <param name="input">书籍更新输入</param>
-        /// <returns>更新后的书籍DTO</returns>
         public override async Task<BookDto> UpdateAsync(Guid id, BookUpdateDto input)
         {
-            // 检查更新权限
             await CheckUpdatePolicyAsync();
 
             var book = await _bookRepository.GetAsync(id);
@@ -71,10 +68,8 @@ namespace Yal.BookStore.Books
         /// <summary>
         /// 删除一个书籍
         /// </summary>
-        /// <param name="id">书籍ID</param>
         public override async Task DeleteAsync(Guid id)
         {
-            // 检查删除权限
             await CheckDeletePolicyAsync();
 
             await _bookRepository.DeleteAsync(id);
@@ -83,20 +78,16 @@ namespace Yal.BookStore.Books
         /// <summary>
         /// 批量删除书籍
         /// </summary>
-        /// <param name="input">批量删除信息</param>
         public async Task DeleteManyAsync(List<Guid> input)
         {
-            // 检查删除权限
             await CheckDeletePolicyAsync();
 
             await _bookRepository.DeleteManyAsync(input);
         }
 
         /// <summary>
-        /// 获取书籍列表
+        /// 获取书籍列表，并返回作者名称
         /// </summary>
-        /// <param name="input">查询参数</param>
-        /// <returns>分页结果的书籍DTO列表</returns>
         public override async Task<PagedResultDto<BookDto>> GetListAsync(BookGetListDto input)
         {
             var query = await CreateFilteredQueryAsync(input);
@@ -107,17 +98,52 @@ namespace Yal.BookStore.Books
             query = query.PageBy(input.SkipCount, input.MaxResultCount);
             var books = await AsyncExecuter.ToListAsync(query);
 
-            return new PagedResultDto<BookDto>(
-                totalCount,
-                ObjectMapper.Map<List<Book>, List<BookDto>>(books)
-            );
+            var bookDtos = ObjectMapper.Map<List<Book>, List<BookDto>>(books);
+
+            // 获取所有 AuthorCode
+            var authorCodes = books.Select(x => x.AuthorCode).Distinct().ToList();
+
+            // 通过 AuthorCode 查询缓存
+            var authors = await _authorCacheStore.GetManyByCodesAsync(authorCodes!);
+
+            // 构建 AuthorCode 到 AuthorName 的映射
+            var authorDict = authors.ToDictionary(a => a.Code, a => a.Name);
+
+            // 赋值 AuthorName
+            foreach (var bookDto in bookDtos)
+            {
+                if (authorDict.TryGetValue(bookDto.AuthorCode, out var authorName))
+                {
+                    bookDto.AuthorName = authorName!;
+                }
+            }
+
+            return new PagedResultDto<BookDto>(totalCount, bookDtos);
         }
 
         /// <summary>
-        /// 创建查询过滤条件
+        /// 获取单个书籍详情，并返回作者名称
         /// </summary>
-        /// <param name="input">查询参数</param>
-        /// <returns>查询语句</returns>
+        public override async Task<BookDto> GetAsync(Guid id)
+        {
+            // 先查缓存
+            var book = await _bookCacheStore.GetAsync(id);
+            if (book == null)
+            {
+                book = await _bookRepository.GetAsync(id);
+                await _bookCacheStore.SetAsync(id, book);
+            }
+
+            var bookDto = ObjectMapper.Map<Book, BookDto>(book);
+
+            // 查找 Author 名称（优先缓存）
+            var author = await _authorCacheStore.GetByCodeAsync(book.AuthorCode!);
+            bookDto.AuthorName = author.Name!;
+
+            return bookDto;
+        }
+        #endregion
+
         protected override async Task<IQueryable<Book>> CreateFilteredQueryAsync(BookGetListDto input)
         {
             var query = await _bookRepository.GetQueryableAsync();
@@ -129,17 +155,5 @@ namespace Yal.BookStore.Books
             return query;
         }
 
-        /// <summary>
-        /// 获取单个书籍详情
-        /// </summary>
-        /// <param name="id">书籍ID</param>
-        /// <returns>书籍DTO</returns>
-        public override async Task<BookDto> GetAsync(Guid id)
-        {
-            var book = await _bookRepository.GetAsync(id);
-            return ObjectMapper.Map<Book, BookDto>(book);
-        }
-
-        #endregion
     }
 }
