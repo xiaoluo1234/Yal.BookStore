@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
@@ -90,6 +91,8 @@ namespace Yal.BookStore.Books
         /// </summary>
         public override async Task<PagedResultDto<BookDto>> GetListAsync(BookGetListDto input)
         {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
             var query = await CreateFilteredQueryAsync(input);
             var totalCount = await AsyncExecuter.CountAsync(query);
 
@@ -117,7 +120,8 @@ namespace Yal.BookStore.Books
                     bookDto.AuthorName = authorName!;
                 }
             }
-
+            stopwatch.Stop();
+            Console.WriteLine($"查询图书列表，使用缓存查找图书作者，耗时: {stopwatch.ElapsedMilliseconds}ms");
             return new PagedResultDto<BookDto>(totalCount, bookDtos);
         }
 
