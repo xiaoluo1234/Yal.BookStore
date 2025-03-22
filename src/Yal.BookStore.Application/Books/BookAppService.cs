@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
@@ -12,16 +13,20 @@ namespace Yal.BookStore.Books
     public class BookAppService : CrudAppService<Book, BookDto, Guid, BookGetListDto, BookCreateDto, BookUpdateDto>, IBookAppService
     {
         private readonly IBookRepository _bookRepository;
+        private readonly IAuthorRepository _authorRepository;
         private readonly IDataCacheStore<Author, Guid> _authorCacheStore;
         private readonly IDataCacheStore<Book, Guid> _bookCacheStore;
 
         public BookAppService(
             IBookRepository bookRepository,
+            IAuthorRepository authorRepository,
             IDataCacheStore<Author, Guid> authorCacheStore,
             IDataCacheStore<Book, Guid> bookCacheStore
+
         ) : base(bookRepository)
         {
             _bookRepository = bookRepository;
+            _authorRepository = authorRepository;
             _authorCacheStore = authorCacheStore;
             _bookCacheStore = bookCacheStore;
         }
@@ -90,6 +95,8 @@ namespace Yal.BookStore.Books
         /// </summary>
         public override async Task<PagedResultDto<BookDto>> GetListAsync(BookGetListDto input)
         {
+            Stopwatch sw = new();
+            sw.Start();
             var query = await CreateFilteredQueryAsync(input);
             var totalCount = await AsyncExecuter.CountAsync(query);
 
@@ -100,24 +107,14 @@ namespace Yal.BookStore.Books
 
             var bookDtos = ObjectMapper.Map<List<Book>, List<BookDto>>(books);
 
-            // 获取所有 AuthorCode
-            var authorCodes = books.Select(x => x.AuthorCode).Distinct().ToList();
-
-            // 通过 AuthorCode 查询缓存
-            var authors = await _authorCacheStore.GetManyByCodesAsync(authorCodes!);
-
-            // 构建 AuthorCode 到 AuthorName 的映射
-            var authorDict = authors.ToDictionary(a => a.Code, a => a.Name);
-
-            // 赋值 AuthorName
+            var authorCodes = bookDtos.Select(x => x.AuthorCode).Distinct().ToList();
+            var authorsCodeNameDic = await _authorRepository.GetAuthorCodeNameDic(authorCodes);
             foreach (var bookDto in bookDtos)
             {
-                if (authorDict.TryGetValue(bookDto.AuthorCode, out var authorName))
-                {
-                    bookDto.AuthorName = authorName!;
-                }
+                bookDto.AuthorName = authorsCodeNameDic[bookDto.AuthorCode];
             }
-
+            sw.Stop();
+            Console.WriteLine($"GetListAsync: {sw.ElapsedMilliseconds}ms");
             return new PagedResultDto<BookDto>(totalCount, bookDtos);
         }
 
