@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
@@ -14,6 +16,12 @@ namespace Yal.BookStore.Books
         private readonly IBookRepository _bookRepository;
         private readonly IDataCacheStore<Author, Guid> _authorCacheStore;
         private readonly IDataCacheStore<Book, Guid> _bookCacheStore;
+
+        private static readonly Dictionary<string, string> _authorDict = new()
+        {
+            {"yangailin","杨艾霖" },
+            {"zhuangjunwu","庄俊武" }
+        };
 
         public BookAppService(
             IBookRepository bookRepository,
@@ -90,6 +98,8 @@ namespace Yal.BookStore.Books
         /// </summary>
         public override async Task<PagedResultDto<BookDto>> GetListAsync(BookGetListDto input)
         {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
             var query = await CreateFilteredQueryAsync(input);
             var totalCount = await AsyncExecuter.CountAsync(query);
 
@@ -100,24 +110,16 @@ namespace Yal.BookStore.Books
 
             var bookDtos = ObjectMapper.Map<List<Book>, List<BookDto>>(books);
 
-            // 获取所有 AuthorCode
-            var authorCodes = books.Select(x => x.AuthorCode).Distinct().ToList();
-
-            // 通过 AuthorCode 查询缓存
-            var authors = await _authorCacheStore.GetManyByCodesAsync(authorCodes!);
-
-            // 构建 AuthorCode 到 AuthorName 的映射
-            var authorDict = authors.ToDictionary(a => a.Code, a => a.Name);
-
             // 赋值 AuthorName
             foreach (var bookDto in bookDtos)
             {
-                if (authorDict.TryGetValue(bookDto.AuthorCode, out var authorName))
+                if (_authorDict.TryGetValue(bookDto.AuthorCode, out var authorName))
                 {
                     bookDto.AuthorName = authorName!;
                 }
             }
-
+            stopwatch.Stop();
+            Console.WriteLine($"GetListAsync耗时：{stopwatch.ElapsedMilliseconds}ms");
             return new PagedResultDto<BookDto>(totalCount, bookDtos);
         }
 
