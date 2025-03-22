@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
@@ -90,6 +91,8 @@ namespace Yal.BookStore.Books
         /// </summary>
         public override async Task<PagedResultDto<BookDto>> GetListAsync(BookGetListDto input)
         {
+            Stopwatch stopwatch = new();
+            stopwatch.Start();
             var query = await CreateFilteredQueryAsync(input);
             var totalCount = await AsyncExecuter.CountAsync(query);
 
@@ -100,24 +103,9 @@ namespace Yal.BookStore.Books
 
             var bookDtos = ObjectMapper.Map<List<Book>, List<BookDto>>(books);
 
-            // 获取所有 AuthorCode
-            var authorCodes = books.Select(x => x.AuthorCode).Distinct().ToList();
-
-            // 通过 AuthorCode 查询缓存
-            var authors = await _authorCacheStore.GetManyByCodesAsync(authorCodes!);
-
-            // 构建 AuthorCode 到 AuthorName 的映射
-            var authorDict = authors.ToDictionary(a => a.Code, a => a.Name);
-
-            // 赋值 AuthorName
-            foreach (var bookDto in bookDtos)
-            {
-                if (authorDict.TryGetValue(bookDto.AuthorCode, out var authorName))
-                {
-                    bookDto.AuthorName = authorName!;
-                }
-            }
-
+            // 查找 Author 名称逻辑，不同分支采用不同的查询方式
+            stopwatch.Stop();
+            Console.WriteLine($"查询书籍列表耗时：{stopwatch.ElapsedMilliseconds}ms");
             return new PagedResultDto<BookDto>(totalCount, bookDtos);
         }
 
@@ -136,9 +124,7 @@ namespace Yal.BookStore.Books
 
             var bookDto = ObjectMapper.Map<Book, BookDto>(book);
 
-            // 查找 Author 名称（优先缓存）
-            var author = await _authorCacheStore.GetByCodeAsync(book.AuthorCode!);
-            bookDto.AuthorName = author.Name!;
+            // 查找 Author 名称逻辑，不同分支采用不同的查询方式
 
             return bookDto;
         }
