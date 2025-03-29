@@ -13,12 +13,11 @@ using Volo.Abp.Account.Web;
 using Volo.Abp.AspNetCore.Mvc;
 using Volo.Abp.AspNetCore.Mvc.Localization;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
-using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Identity.Web;
 using Volo.Abp.Modularity;
@@ -33,7 +32,6 @@ using Yal.BookStore.EntityFrameworkCore;
 using Yal.BookStore.HttiApi.Host.DbMigrations;
 using Yal.BookStore.Localization;
 using Yal.BookStore.MultiTenancy;
-using Volo.Abp.Caching;
 
 namespace Yal.BookStore.HttpApi.Host;
 
@@ -45,7 +43,6 @@ namespace Yal.BookStore.HttpApi.Host;
     typeof(AbpIdentityWebModule),
     typeof(AbpSettingManagementWebModule),
     typeof(AbpAccountWebOpenIddictModule),
-    typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpTenantManagementWebModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule),
@@ -101,7 +98,6 @@ public class BookStoreHttpApiHostModule : AbpModule
 
         ConfigureAuthentication(context);
         ConfigureUrls(configuration);
-        ConfigureBundles();
         ConfigureAutoMapper();
         ConfigureVirtualFileSystem(hostingEnvironment);
         ConfigureSwaggerServices(context.Services);
@@ -126,20 +122,6 @@ public class BookStoreHttpApiHostModule : AbpModule
         Configure<AppUrlOptions>(options =>
         {
             options.Applications["MVC"].RootUrl = configuration["App:SelfUrl"];
-        });
-    }
-
-    private void ConfigureBundles()
-    {
-        Configure<AbpBundlingOptions>(options =>
-        {
-            options.StyleBundles.Configure(
-                LeptonXLiteThemeBundles.Styles.Global,
-                bundle =>
-                {
-                    bundle.AddFiles("/global-styles.css");
-                }
-            );
         });
     }
 
@@ -204,7 +186,6 @@ public class BookStoreHttpApiHostModule : AbpModule
         }
 
         app.UseCorrelationId();
-        app.MapAbpStaticAssets();
         app.UseRouting();
         app.UseAuthentication();
         app.UseAbpOpenIddictValidation();
