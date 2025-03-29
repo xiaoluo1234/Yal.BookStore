@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -39,6 +41,13 @@ namespace Yal.BookStore.Authors
                 null => throw new AuthorNotFoundException(),
                 _ => entity
             };
+        }
+
+        public async Task<Dictionary<string, string>> GetAuthorCodeNameDic(List<string> codes)
+        {
+            return await (await GetQueryableAsync())
+                .Where(x => codes.Contains(x.Code!))
+                .ToDictionaryAsync(x => x.Code!, x => x.Name!);
         }
     }
 

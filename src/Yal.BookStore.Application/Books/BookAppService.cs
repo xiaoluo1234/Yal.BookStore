@@ -13,16 +13,20 @@ namespace Yal.BookStore.Books
     public class BookAppService : CrudAppService<Book, BookDto, Guid, BookGetListDto, BookCreateDto, BookUpdateDto>, IBookAppService
     {
         private readonly IBookRepository _bookRepository;
+        private readonly IAuthorRepository _authorRepository;
         private readonly IDataCacheStore<Author, Guid> _authorCacheStore;
         private readonly IDataCacheStore<Book, Guid> _bookCacheStore;
 
         public BookAppService(
             IBookRepository bookRepository,
+            IAuthorRepository authorRepository,
             IDataCacheStore<Author, Guid> authorCacheStore,
             IDataCacheStore<Book, Guid> bookCacheStore
+
         ) : base(bookRepository)
         {
             _bookRepository = bookRepository;
+            _authorRepository = authorRepository;
             _authorCacheStore = authorCacheStore;
             _bookCacheStore = bookCacheStore;
         }

@@ -3,7 +3,7 @@
   <Import Project="..\..\common.props" />
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <RootNamespace>Yal.BookStore</RootNamespace>
   </PropertyGroup>
@@ -11,7 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Yal.BookStore.EntityFrameworkCore\Yal.BookStore.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\Yal.BookStore.Application.Tests\Yal.BookStore.Application.Tests.csproj" />
-    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="9.1.0" />
+    <PackageReference Include="Volo.Abp.EntityFrameworkCore.Sqlite" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
